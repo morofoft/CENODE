@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login | CENODE Audit Portal</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+</head>
+<body class="bg-slate-50 min-h-screen flex items-center justify-center p-4">
+
+    <div class="max-w-4xl w-full bg-white rounded-3xl shadow-2xl overflow-hidden flex flex-col md:flex-row">
+        
+        <div class="hidden md:flex md:w-1/2 bg-emerald-800 p-12 flex-col justify-between text-white relative">
+            <div class="absolute top-0 right-0 p-8 opacity-10">
+                <i class="fas fa-stethoscope text-9xl"></i>
+            </div>
+            
+            <div>
+                <div class="bg-white/10 w-16 h-16 rounded-2xl flex items-center justify-center mb-6 backdrop-blur-sm border border-white/20">
+                    <i class="fas fa-hospital-user text-3xl"></i>
+                </div>
+                <h1 class="text-4xl font-bold mb-4">CENODE</h1>
+                <p class="text-emerald-100 text-lg leading-relaxed">
+                    Portal de Auditoría Médica y Cumplimiento de Procedimientos.
+                </p>
+            </div>
+
+            <div class="text-sm text-emerald-300">
+                &copy; 2026 Gestión Hospitalaria. Todos los derechos reservados.
+            </div>
+        </div>
+
+        <div class="w-full md:w-1/2 p-8 md:p-12">
+            <div class="md:hidden flex items-center gap-3 mb-8">
+                <div class="bg-emerald-800 p-2 rounded-lg text-white">
+                    <i class="fas fa-hospital-user text-xl"></i>
+                </div>
+                <h2 class="text-2xl font-bold text-slate-800">CENODE</h2>
+            </div>
+
+            <h2 class="text-3xl font-bold text-slate-800 mb-2">Bienvenido</h2>
+            <p class="text-slate-500 mb-8">Por favor, ingresa tus credenciales para continuar.</p>
+
+            <form action="index.html" class="space-y-6">
+                <div>
+                    <label class="block text-sm font-semibold text-slate-700 mb-2">Usuario / Email</label>
+                    <div class="relative">
+                        <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-slate-400">
+                            <i class="fas fa-user"></i>
+                        </span>
+                        <input type="text" required
+                            class="w-full pl-10 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-all"
+                            placeholder="Ej. admin_garcia">
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-sm font-semibold text-slate-700 mb-2">Contraseña</label>
+                    <div class="relative">
+                        <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-slate-400">
+                            <i class="fas fa-lock"></i>
+                        </span>
+                        <input type="password" required
+                            class="w-full pl-10 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-all"
+                            placeholder="••••••••">
+                    </div>
+                </div>
+
+                <div class="flex items-center justify-between text-sm">
+                    <label class="flex items-center text-slate-600 cursor-pointer">
+                        <input type="checkbox" class="rounded border-slate-300 text-emerald-600 focus:ring-emerald-500 mr-2">
+                        Recordarme
+                    </label>
+                    <a href="#" class="text-emerald-600 hover:underline font-medium">¿Olvidaste tu contraseña?</a>
+                </div>
+
+                <button type="submit" 
+                    class="w-full bg-emerald-800 hover:bg-emerald-900 text-white font-bold py-3 px-4 rounded-xl shadow-lg shadow-emerald-800/20 transform transition-all active:scale-95 flex items-center justify-center gap-2">
+                    Iniciar Sesión
+                    <i class="fas fa-arrow-right"></i>
+                </button>
+            </form>
+
+            <div class="mt-12 text-center">
+                <p class="text-sm text-slate-500">
+                    ¿Problemas con el acceso? <br>
+                    <a href="mailto:soporte@clinica.com" class="text-emerald-600 font-semibold hover:underline underline-offset-4">Contacta a TI</a>
+                </p>
+            </div>
+        </div>
+    </div>
+
+</body>
+</html>

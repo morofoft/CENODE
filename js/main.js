@@ -1,3 +1,17 @@
+// Dentro de tu función de renderizado de gráficos
+const colorEmerald = '#10b981'; // Tailwind emerald-500
+const colorEmeraldLight = 'rgba(16, 185, 129, 0.2)';
+
+// Ejemplo para el gráfico de barras
+datasets: [{
+  label: '% Cumplimiento',
+  data: valores,
+  backgroundColor: colorEmeraldLight,
+  borderColor: colorEmerald,
+  borderWidth: 2,
+  borderRadius: 8, // Barras redondeadas
+}]
+
 // =====================
 // FILTROS
 // =====================

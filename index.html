@@ -1,91 +1,197 @@
 <!DOCTYPE html>
-<html>
+<html lang="es">
 <head>
-  <title>Dashboard</title>
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <link rel="stylesheet" href="css/main.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard | CENODE Audit Portal</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
 </head>
+<body class="bg-slate-50 text-slate-800 font-sans" onload="initDashboard()">
 
-<body onload="initDashboard()">
+    <header class="bg-emerald-800 text-white shadow-lg">
+        <div class="max-w-7xl mx-auto px-4 py-4 flex justify-between items-center">
+            <div class="flex items-center gap-3">
+                <div class="bg-white p-2 rounded-lg text-emerald-800 text-xl font-bold">
+                    <i class="fas fa-chart-line"></i>
+                </div>
+                <div>
+                    <h1 class="text-xl font-bold leading-tight">CENODE</h1>
+                    <p class="text-xs text-emerald-200 uppercase tracking-tighter">Panel de Control Gerencial</p>
+                </div>
+            </div>
+            <div class="flex items-center gap-4">
+                <span class="text-sm bg-emerald-700/50 px-3 py-1 rounded-full border border-emerald-600 flex items-center gap-2">
+                    <span class="h-2 w-2 rounded-full bg-emerald-400 animate-pulse"></span>
+                    En Línea
+                </span>
+            </div>
+        </div>
+    </header>
 
-<div class="header">
-  <h2>CENODE Dashboard</h2>
-</div>
+    <nav class="bg-white border-b border-slate-200 sticky top-0 z-10">
+        <div class="max-w-7xl mx-auto px-4 flex gap-8">
+            <a href="index.html" class="py-4 px-2 border-b-2 border-emerald-600 text-emerald-600 font-bold flex items-center gap-2">
+                <i class="fas fa-th-large"></i> Dashboard
+            </a>
+            <a href="registro.html" class="py-4 px-2 text-slate-500 hover:text-emerald-600 transition-colors flex items-center gap-2">
+                <i class="fas fa-plus-circle"></i> Registro
+            </a>
+            <a href="reporte.html" class="py-4 px-2 text-slate-500 hover:text-emerald-600 transition-colors flex items-center gap-2">
+                <i class="fas fa-file-alt"></i> Reportes
+            </a>
+        </div>
+    </nav>
 
-<div class="nav">
-  <a href="index.html" class="active">Dashboard</a>
-  <a href="registro.html">Registro</a>
-  <a href="reporte.html">Reportes</a>
-</div>
+    <main class="max-w-7xl mx-auto px-4 py-8 space-y-8">
+        
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            <div class="bg-white p-6 rounded-3xl shadow-sm border border-slate-100 transition-transform hover:scale-[1.02]">
+                <p class="text-xs font-bold text-slate-400 uppercase mb-1">Total Auditorías</p>
+                <h3 id="kpi-total" class="text-3xl font-black text-slate-800">0</h3>
+                <p class="text-[10px] text-emerald-500 mt-2"><i class="fas fa-sync"></i> Datos actualizados</p>
+            </div>
+            <div class="bg-white p-6 rounded-3xl shadow-sm border border-slate-100 transition-transform hover:scale-[1.02]">
+                <p class="text-xs font-bold text-slate-400 uppercase mb-1">Cumplimiento Global</p>
+                <h3 id="kpi-cumplimiento" class="text-3xl font-black text-emerald-600">0%</h3>
+                <div class="w-full bg-slate-100 h-1.5 mt-3 rounded-full overflow-hidden">
+                    <div id="kpi-bar" class="bg-emerald-500 h-full" style="width: 0%"></div>
+                </div>
+            </div>
+            <div class="bg-white p-6 rounded-3xl shadow-sm border border-slate-100 transition-transform hover:scale-[1.02]">
+                <p class="text-xs font-bold text-slate-400 uppercase mb-1">Total Enviados</p>
+                <h3 id="kpi-enviados" class="text-3xl font-black text-slate-800">0</h3>
+                <p class="text-[10px] text-slate-400 mt-2 italic">Casos cerrados OK</p>
+            </div>
+            <div class="bg-emerald-800 p-6 rounded-3xl shadow-lg shadow-emerald-900/20 text-white transition-transform hover:scale-[1.02]">
+                <p class="text-xs font-bold opacity-70 uppercase mb-1">Monto Generado</p>
+                <h3 id="kpi-monto" class="text-3xl font-black">$0.00</h3>
+                <p class="text-[10px] opacity-70 mt-2 font-mono italic text-emerald-100">Cierre acumulado</p>
+            </div>
+        </div>
 
-<div class="content">
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            <div class="bg-white p-8 rounded-3xl shadow-sm border border-slate-100">
+                <div class="flex items-center justify-between mb-6">
+                    <h4 class="font-bold text-slate-700 flex items-center gap-2">
+                        <i class="fas fa-chart-bar text-emerald-600"></i> Desempeño por Departamento
+                    </h4>
+                </div>
+                <canvas id="chartDept" height="250"></canvas>
+            </div>
 
-  <!-- 🔎 FILTROS -->
-  <div class="card" style="margin-bottom:15px;">
-    <label>Desde:</label>
-    <input type="date" id="f-desde">
+            <div class="bg-white p-8 rounded-3xl shadow-sm border border-slate-100">
+                <div class="flex items-center justify-between mb-6">
+                    <h4 class="font-bold text-slate-700 flex items-center gap-2">
+                        <i class="fas fa-chart-line text-emerald-600"></i> Tendencia de Envío (Histórico)
+                    </h4>
+                </div>
+                <canvas id="chartEvol" height="250"></canvas>
+            </div>
+        </div>
 
-    <label>Hasta:</label>
-    <input type="date" id="f-hasta">
+    </main>
 
-    <label>Departamento:</label>
-    <select id="f-dept">
-      <option value="">Todos</option>
-    </select>
+    <script>
+        let chartDept = null;
+        let chartEvol = null;
 
-    <button onclick="renderDashboard()">Aplicar</button>
-    <button onclick="resetFilters()">Limpiar</button>
-  </div>
+        function initDashboard() {
+            const data = JSON.parse(localStorage.getItem('auditData')) || [];
+            
+            if (data.length === 0) {
+                console.log("No hay datos para mostrar.");
+                return;
+            }
 
-  <!-- 📊 KPIs -->
-  <div class="kpi">
+            // 1. Calcular KPIs
+            let totalProc = 0, totalEnv = 0, totalMonto = 0;
+            data.forEach(r => {
+                totalProc += r.total;
+                totalEnv += r.enviadook;
+                totalMonto += r.monto;
+            });
 
-    <div class="card">
-      <h4>Total registros</h4>
-      <div id="kpi-total">0</div>
-      <small>procedimientos</small>
-    </div>
+            document.getElementById('kpi-total').innerText = totalProc;
+            document.getElementById('kpi-enviados').innerText = totalEnv;
+            document.getElementById('kpi-monto').innerText = `$${totalMonto.toLocaleString()}`;
+            
+            const porcGlobal = totalProc > 0 ? Math.round((totalEnv / totalProc) * 100) : 0;
+            document.getElementById('kpi-cumplimiento').innerText = porcGlobal + "%";
+            document.getElementById('kpi-bar').style.width = porcGlobal + "%";
 
-    <div class="card">
-      <h4>Enviados OK</h4>
-      <div id="kpi-env">0</div>
-      <small>completados</small>
-    </div>
+            // 2. Procesar Datos para Gráfica de Barras (Por Departamento)
+            const deptMap = {};
+            data.forEach(r => {
+                if (!deptMap[r.departamento]) deptMap[r.departamento] = { t: 0, e: 0 };
+                deptMap[r.departamento].t += r.total;
+                deptMap[r.departamento].e += r.enviadook;
+            });
 
-    <div class="card">
-      <h4>No enviado</h4>
-      <div id="kpi-noenv">0</div>
-      <small>pendientes</small>
-    </div>
+            const labelsDept = Object.keys(deptMap);
+            const valuesDept = labelsDept.map(d => 
+                deptMap[d].t > 0 ? Math.round((deptMap[d].e / deptMap[d].t) * 100) : 0
+            );
 
-    <div class="card">
-      <h4>Cumplimiento</h4>
-      <div id="kpi-pct">0%</div>
-      <small>Enviado OK / Total</small>
-    </div>
+            // 3. Procesar Datos para Gráfica de Evolución (Por Fecha)
+            const dateMap = {};
+            data.forEach(r => {
+                if (!dateMap[r.fecha]) dateMap[r.fecha] = 0;
+                dateMap[r.fecha] += r.enviadook;
+            });
+            const labelsFechas = Object.keys(dateMap).sort();
+            const valuesFechas = labelsFechas.map(f => dateMap[f]);
 
-    <div class="card">
-      <h4>Monto total</h4>
-      <div id="kpi-monto">$0</div>
-      <small>en auditoría</small>
-    </div>
+            renderCharts(labelsDept, valuesDept, labelsFechas, valuesFechas);
+        }
 
-    
+        function renderCharts(labelsDept, valuesDept, labelsFechas, valuesFechas) {
+            const ctx1 = document.getElementById('chartDept').getContext('2d');
+            const ctx2 = document.getElementById('chartEvol').getContext('2d');
 
-  </div>
+            // Gráfica de Barras
+            chartDept = new Chart(ctx1, {
+                type: 'bar',
+                data: {
+                    labels: labelsDept,
+                    datasets: [{
+                        label: '% Cumplimiento',
+                        data: valuesDept,
+                        backgroundColor: 'rgba(16, 185, 129, 0.2)',
+                        borderColor: '#10b981',
+                        borderWidth: 2,
+                        borderRadius: 12
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    scales: { y: { min: 0, max: 100, ticks: { callback: v => v + '%' } } }
+                }
+            });
 
-  <div class="card" style="margin-top:20px;">
-    <h3>Cumplimiento por Departamento</h3>
-    <canvas id="chartDept" height="120"></canvas>
-  </div>
-  
-  <div class="card" style="margin-top:20px;">
-    <h3>Evolución diaria (Enviado OK)</h3>
-    <canvas id="chartEvolucion" height="120"></canvas>
-  </div>
-
-</div>
-
-<script src="js/main.js"></script>
+            // Gráfica de Línea
+            chartEvol = new Chart(ctx2, {
+                type: 'line',
+                data: {
+                    labels: labelsFechas,
+                    datasets: [{
+                        label: 'Total Enviados',
+                        data: valuesFechas,
+                        borderColor: '#065f46',
+                        backgroundColor: 'rgba(6, 95, 70, 0.1)',
+                        fill: true,
+                        tension: 0.4,
+                        pointRadius: 6,
+                        pointBackgroundColor: '#fff',
+                        pointBorderWidth: 3
+                    }]
+                },
+                options: {
+                    responsive: true
+                }
+            });
+        }
+    </script>
 </body>
 </html>

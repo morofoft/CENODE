@@ -1,65 +1,204 @@
 <!DOCTYPE html>
-<html>
+<html lang="es">
 <head>
-  <title>Reportes</title>
-  <link rel="stylesheet" href="css/main.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reportes | CENODE Audit Portal</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        @media print {
+            .no-print { display: none !important; }
+            body { background: white; padding: 0; }
+            .shadow-xl, .shadow-sm { box-shadow: none !important; border: 1px solid #e2e8f0 !important; }
+            main { max-width: 100% !important; width: 100% !important; padding: 0 !important; }
+        }
+    </style>
 </head>
+<body class="bg-slate-50 text-slate-800 font-sans" onload="initReporte()">
 
-<body onload="initReportes()">
+    <header class="bg-emerald-800 text-white shadow-lg no-print">
+        <div class="max-w-7xl mx-auto px-4 py-4 flex justify-between items-center">
+            <div class="flex items-center gap-3">
+                <div class="bg-white p-2 rounded-lg text-emerald-800">
+                    <i class="fas fa-file-invoice text-2xl"></i>
+                </div>
+                <h1 class="text-xl font-bold leading-tight">CENODE Reports</h1>
+            </div>
+            <button onclick="window.print()" class="bg-emerald-700 hover:bg-emerald-600 px-4 py-2 rounded-xl text-sm font-bold transition-all flex items-center gap-2">
+                <i class="fas fa-print"></i> Generar PDF
+            </button>
+        </div>
+    </header>
 
-<div class="header">
-  <h2>Reportes de Auditoría</h2>
-</div>
+    <nav class="bg-white border-b border-slate-200 sticky top-0 z-10 no-print">
+        <div class="max-w-7xl mx-auto px-4 flex gap-8">
+            <a href="index.html" class="py-4 px-2 text-slate-500 hover:text-emerald-600 transition-colors flex items-center gap-2">
+                <i class="fas fa-chart-pie"></i> Dashboard
+            </a>
+            <a href="registro.html" class="py-4 px-2 text-slate-500 hover:text-emerald-600 transition-colors flex items-center gap-2">
+                <i class="fas fa-edit"></i> Registro
+            </a>
+            <a href="reporte.html" class="py-4 px-2 border-b-2 border-emerald-600 text-emerald-600 font-semibold flex items-center gap-2">
+                <i class="fas fa-file-medical-alt"></i> Reportes
+            </a>
+        </div>
+    </nav>
 
-<div class="nav">
-  <a href="index.html">Dashboard</a>
-  <a href="registro.html">Registro</a>
-  <a href="reporte.html" class="active">Reportes</a>
-</div>
+    <main class="max-w-7xl mx-auto px-4 py-8 space-y-6">
+        
+        <div class="bg-white p-6 rounded-3xl shadow-sm border border-slate-100 no-print">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-4 items-end">
+                <div>
+                    <label class="block text-xs font-bold text-slate-400 uppercase mb-1 tracking-wider">Fecha Inicial</label>
+                    <input type="date" id="f-desde" class="w-full px-4 py-2 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:ring-2 focus:ring-emerald-500">
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-slate-400 uppercase mb-1 tracking-wider">Fecha Final</label>
+                    <input type="date" id="f-hasta" class="w-full px-4 py-2 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:ring-2 focus:ring-emerald-500">
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-slate-400 uppercase mb-1 tracking-wider">Departamento</label>
+                    <select id="f-dept" class="w-full px-4 py-2 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:ring-2 focus:ring-emerald-500">
+                        <option value="">Todos los Departamentos</option>
+                        <option>Rayos X</option>
+                        <option>Laboratorio</option>
+                        <option>Sonografía</option>
+                        <option>Mamografía</option>
+                    </select>
+                </div>
+                <div class="flex gap-2">
+                    <button onclick="renderReporte()" class="flex-1 bg-emerald-800 hover:bg-emerald-900 text-white font-bold py-2 rounded-xl transition-all shadow-md">
+                        Filtrar
+                    </button>
+                    <button onclick="resetFiltros()" class="px-4 bg-slate-100 text-slate-500 rounded-xl hover:bg-slate-200 transition-all">
+                        <i class="fas fa-undo"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
 
-<div class="content">
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-4 no-print">
+            <div class="bg-white p-4 rounded-2xl border border-slate-100">
+                <p class="text-[10px] font-bold text-slate-400 uppercase">Total Proc.</p>
+                <h4 id="res-total" class="text-xl font-bold text-slate-800">0</h4>
+            </div>
+            <div class="bg-white p-4 rounded-2xl border border-slate-100">
+                <p class="text-[10px] font-bold text-emerald-500 uppercase">Enviados OK</p>
+                <h4 id="res-env" class="text-xl font-bold text-emerald-600">0</h4>
+            </div>
+            <div class="bg-white p-4 rounded-2xl border border-slate-100">
+                <p class="text-[10px] font-bold text-red-400 uppercase">No Enviados</p>
+                <h4 id="res-noenv" class="text-xl font-bold text-red-500">0</h4>
+            </div>
+            <div class="bg-emerald-800 p-4 rounded-2xl text-white">
+                <p class="text-[10px] font-bold opacity-70 uppercase">Monto Filtrado</p>
+                <h4 id="res-monto" class="text-xl font-bold text-emerald-100">$0.00</h4>
+            </div>
+        </div>
 
-  <!-- FILTROS -->
-  <div class="card">
-    <label>Departamento</label>
-    <select id="r-dept">
-      <option value="">Todos</option>
-    </select>
+        <div class="bg-white rounded-3xl shadow-xl border border-slate-100 overflow-hidden">
+            <div class="overflow-x-auto">
+                <table class="w-full text-left border-collapse">
+                    <thead>
+                        <tr class="bg-slate-50 text-slate-500 text-[10px] uppercase font-black tracking-widest">
+                            <th class="px-6 py-4">Fecha</th>
+                            <th class="px-6 py-4">Departamento</th>
+                            <th class="px-6 py-4 text-center">Total</th>
+                            <th class="px-6 py-4 text-center">Env OK</th>
+                            <th class="px-6 py-4 text-center">No Env</th>
+                            <th class="px-6 py-4 text-right">Monto</th>
+                            <th class="px-6 py-4 text-center">% Cumpl.</th>
+                        </tr>
+                    </thead>
+                    <tbody id="reporteBody" class="divide-y divide-slate-100 text-sm">
+                        </tbody>
+                </table>
+            </div>
+            <div id="noData" class="hidden p-20 text-center">
+                <i class="fas fa-search text-4xl text-slate-200 mb-3"></i>
+                <p class="text-slate-400">No se encontraron registros para los filtros seleccionados.</p>
+            </div>
+        </div>
+    </main>
 
-    <button onclick="generateReport()">Generar Reporte</button>
-  </div>
+    <script>
+        function initReporte() {
+            // Establecer fechas por defecto (mes actual)
+            const hoy = new Date();
+            const haceMes = new Date();
+            haceMes.setMonth(hoy.getMonth() - 1);
+            
+            document.getElementById('f-hasta').valueAsDate = hoy;
+            document.getElementById('f-desde').valueAsDate = haceMes;
+            
+            renderReporte();
+        }
 
-  <!-- KPIs -->
-  <div class="kpi" style="margin-top:15px;">
-    <div class="card">
-      <h4>Total</h4>
-      <div id="r-total">0</div>
-    </div>
+        function resetFiltros() {
+            initReporte();
+            document.getElementById('f-dept').value = "";
+        }
 
-    <div class="card">
-      <h4>Enviado OK</h4>
-      <div id="r-env">0</div>
-    </div>
+        function renderReporte() {
+            const desde = document.getElementById('f-desde').value;
+            const hasta = document.getElementById('f-hasta').value;
+            const dept = document.getElementById('f-dept').value;
+            
+            const db = JSON.parse(localStorage.getItem('auditData')) || [];
+            
+            // Filtrar lógica
+            const filtrados = db.filter(r => {
+                const matchFecha = (!desde || r.fecha >= desde) && (!hasta || r.fecha <= hasta);
+                const matchDept = !dept || r.departamento === dept;
+                return matchFecha && matchDept;
+            });
 
-    <div class="card">
-      <h4>Cumplimiento</h4>
-      <div id="r-pct">0%</div>
-    </div>
+            const body = document.getElementById('reporteBody');
+            const noData = document.getElementById('noData');
+            body.innerHTML = "";
 
-    <div class="card">
-      <h4>Monto</h4>
-      <div id="r-monto">$0</div>
-    </div>
-  </div>
+            if (filtrados.length === 0) {
+                noData.classList.remove('hidden');
+            } else {
+                noData.classList.add('hidden');
+                
+                let tProc = 0, tEnv = 0, tNoEnv = 0, tMonto = 0;
 
-  <!-- TABLA -->
-  <div class="card" style="margin-top:20px;">
-    <h3>Resumen por Departamento</h3>
-    <div id="report-table"></div>
-  </div>
+                filtrados.sort((a,b) => new Date(b.fecha) - new Date(a.fecha)).forEach(r => {
+                    const porc = r.total > 0 ? Math.round((r.enviadook / r.total) * 100) : 0;
+                    
+                    // Sumas para resumen
+                    tProc += r.total;
+                    tEnv += r.enviadook;
+                    tNoEnv += r.noenviado;
+                    tMonto += r.monto;
 
-</div>
+                    const row = `
+                        <tr class="hover:bg-slate-50/50 transition-colors">
+                            <td class="px-6 py-4 font-medium text-slate-600">${r.fecha}</td>
+                            <td class="px-6 py-4 font-bold text-slate-800">${r.departamento}</td>
+                            <td class="px-6 py-4 text-center">${r.total}</td>
+                            <td class="px-6 py-4 text-center font-bold text-emerald-600">${r.enviadook}</td>
+                            <td class="px-6 py-4 text-center font-bold text-red-400">${r.noenviado}</td>
+                            <td class="px-6 py-4 text-right font-mono text-slate-500">$${r.monto.toFixed(2)}</td>
+                            <td class="px-6 py-4 text-center">
+                                <span class="px-2 py-1 rounded-full text-[10px] font-black ${porc >= 80 ? 'bg-emerald-100 text-emerald-700' : 'bg-amber-100 text-amber-700'}">
+                                    ${porc}%
+                                </span>
+                            </td>
+                        </tr>
+                    `;
+                    body.innerHTML += row;
+                });
 
-<script src="js/main.js"></script>
+                // Actualizar resumen superior
+                document.getElementById('res-total').innerText = tProc;
+                document.getElementById('res-env').innerText = tEnv;
+                document.getElementById('res-noenv').innerText = tNoEnv;
+                document.getElementById('res-monto').innerText = `$${tMonto.toLocaleString(undefined, {minimumFractionDigits: 2})}`;
+            }
+        }
+    </script>
 </body>
 </html>

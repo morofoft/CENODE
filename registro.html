@@ -1,147 +1,220 @@
 <!DOCTYPE html>
-<html>
+<html lang="es">
 <head>
-  <title>Registro de Auditoría</title>
-  <link rel="stylesheet" href="css/main.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registro de Auditoría | CENODE</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
 </head>
+<body class="bg-slate-50 text-slate-800 font-sans" onload="cargarTabla()">
 
-<body onload="initRegistro()">
-
-<div class="header">
-  <h2>Registro de Auditoría</h2>
-</div>
-
-<div class="nav">
-  <a href="index.html">Dashboard</a>
-  <a href="registro.html" class="active">Registro</a>
-  <a href="reporte.html">Reportes</a>
-</div>
-
-<div class="content">
-    <div class="form-section">
-
-        <h3>Información general</h3>
-      
-        <div class="form-grid">
-          <div class="form-group">
-            <label>Fecha de Auditoría *</label>
-            <input type="date" id="fecha">
-          </div>
-      
-          <div class="form-group">
-            <label>Departamento *</label>
-            <select id="dept">
-              <option value="">-- Seleccionar --</option>
-            </select>
-          </div>
+    <header class="bg-emerald-800 text-white shadow-lg">
+        <div class="max-w-7xl mx-auto px-4 py-4 flex justify-between items-center">
+            <div class="flex items-center gap-3">
+                <div class="bg-white p-2 rounded-lg text-emerald-800">
+                    <i class="fas fa-file-signature text-2xl"></i>
+                </div>
+                <h1 class="text-xl font-bold leading-tight">CENODE Audit</h1>
+            </div>
         </div>
-      
-      </div>
-      
-      
-      <div class="form-section">
-      
-        <h3>Datos de auditoría</h3>
-      
-        <div class="form-grid">
-      
-          <div class="form-group">
-            <label>Total *</label>
-            <input type="number" id="total" min="0" oninput="previewCalc()">
-          </div>
-      
-          <div class="form-group">
-            <label>Fact OK</label>
-            <input type="number" id="factok" min="0">
-          </div>
-      
-          <div class="form-group">
-            <label>Real OK</label>
-            <input type="number" id="realok" min="0">
-          </div>
-      
-          <div class="form-group">
-            <label>Resultado OK</label>
-            <input type="number" id="resultok" min="0">
-          </div>
-      
-          <div class="form-group">
-            <label>Enviado OK *</label>
-            <input type="number" id="env" min="0" oninput="previewCalc()">
-          </div>
-      
-          <div class="form-group">
-            <label>No Enviado</label>
-            <input type="number" id="noenv" min="0">
-          </div>
-      
-          <div class="form-group" style="grid-column:1/-1;">
-            <label>Monto ($)</label>
-            <input type="number" id="monto" step="0.01">
-          </div>
-      
+    </header>
+
+    <nav class="bg-white border-b border-slate-200 sticky top-0 z-10">
+        <div class="max-w-7xl mx-auto px-4 flex gap-8">
+            <a href="index.html" class="py-4 px-2 text-slate-500 hover:text-emerald-600 transition-colors flex items-center gap-2">
+                <i class="fas fa-chart-pie"></i> Dashboard
+            </a>
+            <a href="registro.html" class="py-4 px-2 border-b-2 border-emerald-600 text-emerald-600 font-semibold flex items-center gap-2">
+                <i class="fas fa-edit"></i> Registro
+            </a>
+            <a href="reporte.html" class="py-4 px-2 text-slate-500 hover:text-emerald-600 transition-colors flex items-center gap-2">
+                <i class="fas fa-file-medical-alt"></i> Reportes
+            </a>
         </div>
-      
-        <!-- 🔢 PREVIEW EXACTO -->
-        <div class="calc-preview">
-          <div>
-            <div id="p-total">0</div>
-            <small>Total</small>
-          </div>
-      
-          <div>/</div>
-      
-          <div>
-            <div id="p-env">0</div>
-            <small>Enviado OK</small>
-          </div>
-      
-          <div>=</div>
-      
-          <div>
-            <div id="p-pct">0%</div>
-            <small>Cumplimiento</small>
-          </div>
-      
-          <div style="margin-left:auto;font-size:12px;">
-            Calculado automáticamente
-          </div>
+    </nav>
+
+    <main class="max-w-6xl mx-auto px-4 py-8 space-y-8">
+        <div class="bg-white rounded-3xl shadow-xl border border-slate-100 overflow-hidden">
+            <div class="p-8 border-b border-slate-50 bg-slate-50/50">
+                <h2 class="text-2xl font-bold text-slate-800">Nueva Auditoría Médica</h2>
+            </div>
+
+            <form id="auditForm" class="p-8">
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                    <div>
+                        <label class="block text-sm font-bold text-slate-700 mb-2">Fecha</label>
+                        <input type="date" id="fecha" required class="w-full px-4 py-2 border border-slate-200 rounded-xl outline-none focus:ring-2 focus:ring-emerald-500">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-bold text-slate-700 mb-2">Departamento</label>
+                        <select id="departamento" required class="w-full px-4 py-2 border border-slate-200 rounded-xl outline-none focus:ring-2 focus:ring-emerald-500">
+                            <option>Rayos X</option>
+                            <option>Laboratorio</option>
+                            <option>Sonografía</option>
+                            <option>Mamografía</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-bold text-slate-700 mb-2">Monto Total ($)</label>
+                        <input type="number" id="monto" step="0.01" class="w-full px-4 py-2 border border-slate-200 rounded-xl outline-none focus:ring-2 focus:ring-emerald-500" placeholder="0.00">
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                    <div class="lg:col-span-2 grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div class="p-3 bg-slate-50 rounded-xl border border-slate-100">
+                            <label class="block text-xs font-bold text-slate-500 uppercase">Total *</label>
+                            <input type="number" id="total" oninput="calcular()" required class="w-full font-bold bg-transparent outline-none" placeholder="0">
+                        </div>
+                        <div class="p-3 bg-emerald-50 rounded-xl border border-emerald-100">
+                            <label class="block text-xs font-bold text-emerald-600 uppercase">Enviado OK *</label>
+                            <input type="number" id="enviadook" oninput="calcular()" required class="w-full font-bold bg-transparent outline-none" placeholder="0">
+                        </div>
+                        <div class="p-3 bg-white border border-slate-200 rounded-xl">
+                            <label class="block text-xs text-slate-500">Fact OK</label>
+                            <input type="number" id="factok" class="w-full font-bold outline-none" placeholder="0">
+                        </div>
+                        <div class="p-3 bg-white border border-slate-200 rounded-xl">
+                            <label class="block text-xs text-slate-500">Real OK</label>
+                            <input type="number" id="realok" class="w-full font-bold outline-none" placeholder="0">
+                        </div>
+                        <div class="p-3 bg-white border border-slate-200 rounded-xl">
+                            <label class="block text-xs text-slate-500">Resultado OK</label>
+                            <input type="number" id="resultadook" class="w-full font-bold outline-none" placeholder="0">
+                        </div>
+                        <div class="p-3 bg-red-50 border border-red-100 rounded-xl">
+                            <label class="block text-xs text-red-400 font-bold uppercase">No Enviado</label>
+                            <input type="number" id="noenviado" readonly class="w-full font-bold bg-transparent outline-none text-red-600" placeholder="0">
+                        </div>
+                    </div>
+
+                    <div class="bg-emerald-800 rounded-2xl p-6 text-white text-center flex flex-col justify-center shadow-lg">
+                        <span class="text-xs uppercase tracking-widest opacity-70">Cumplimiento</span>
+                        <div id="porcentajeDisplay" class="text-5xl font-black my-2">0%</div>
+                        <div class="w-full bg-white/20 h-1.5 rounded-full overflow-hidden">
+                            <div id="barraProgreso" class="bg-emerald-400 h-full transition-all duration-500" style="width: 0%"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mt-8 flex gap-3">
+                    <button type="submit" class="flex-1 bg-emerald-800 hover:bg-emerald-900 text-white font-bold py-3 rounded-xl shadow-md transition-all active:scale-95">
+                        <i class="fas fa-save mr-2"></i> Guardar Registro
+                    </button>
+                    <button type="reset" class="px-6 bg-slate-100 text-slate-500 font-bold rounded-xl" onclick="location.reload()">Limpiar</button>
+                </div>
+            </form>
         </div>
-      
-      </div>
-      
-      
-      <div style="display:flex;justify-content:flex-end;gap:10px;">
-        <button onclick="clearForm()">Limpiar</button>
-        <button onclick="saveAudit()">Guardar Auditoría</button>
-      </div>
 
-  <!-- 📋 LISTADO -->
-  <div class="form-section" style="margin-top:16px;">
-    <h3>Registros guardados</h3>
-  
-    <table class="audit-table">
-      <thead>
-        <tr>
-          <th>Fecha</th>
-          <th>Departamento</th>
-          <th>Total</th>
-          <th>Enviado OK</th>
-          <th>Monto</th>
-          <th>Cumplimiento</th>
-          <th></th>
-        </tr>
-      </thead>
-      <tbody id="recent-table-body"></tbody>
-    </table>
-  
-    <div id="recent-empty" class="empty-state">
-      No hay auditorías registradas.
-    </div>
-  </div>
+        <div class="bg-white rounded-3xl shadow-xl border border-slate-100 overflow-hidden">
+            <div class="p-6 border-b border-slate-100 flex justify-between items-center">
+                <h3 class="text-lg font-bold text-slate-800">Registros del Día / Recientes</h3>
+                <span class="text-xs font-bold bg-slate-100 text-slate-500 px-3 py-1 rounded-full uppercase">Local Storage</span>
+            </div>
+            <div class="overflow-x-auto">
+                <table class="w-full text-left border-collapse">
+                    <thead>
+                        <tr class="bg-slate-50 text-slate-500 text-[10px] uppercase font-bold">
+                            <th class="px-6 py-4">Fecha / Depto</th>
+                            <th class="px-6 py-4 text-center">Total</th>
+                            <th class="px-6 py-4 text-center text-emerald-600">Env. OK</th>
+                            <th class="px-6 py-4 text-center text-red-500">No Env.</th>
+                            <th class="px-6 py-4 text-center">Monto</th>
+                            <th class="px-6 py-4 text-center">%</th>
+                            <th class="px-6 py-4 text-center">Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tablaCuerpo" class="text-sm divide-y divide-slate-50">
+                        </tbody>
+                </table>
+            </div>
+        </div>
+    </main>
 
-</div>
+    <script>
+        const form = document.getElementById('auditForm');
+        document.getElementById('fecha').valueAsDate = new Date();
 
-<script src="js/main.js"></script>
+        function calcular() {
+            const total = parseFloat(document.getElementById('total').value) || 0;
+            const env = parseFloat(document.getElementById('enviadook').value) || 0;
+            const noEnv = total > env ? total - env : 0;
+            document.getElementById('noenviado').value = noEnv;
+
+            const porc = total > 0 ? Math.round((env / total) * 100) : 0;
+            document.getElementById('porcentajeDisplay').innerText = porc + "%";
+            document.getElementById('barraProgreso').style.width = Math.min(porc, 100) + "%";
+        }
+
+        function cargarTabla() {
+            const datos = JSON.parse(localStorage.getItem('auditData')) || [];
+            const cuerpo = document.getElementById('tablaCuerpo');
+            cuerpo.innerHTML = "";
+
+            // Mostrar los últimos 10 registros primero
+            datos.reverse().forEach((r, index) => {
+                const porc = r.total > 0 ? Math.round((r.enviadook / r.total) * 100) : 0;
+                const row = `
+                    <tr class="hover:bg-slate-50 transition-colors">
+                        <td class="px-6 py-4">
+                            <div class="font-bold text-slate-800">${r.fecha}</div>
+                            <div class="text-[10px] text-slate-400 uppercase">${r.departamento}</div>
+                        </td>
+                        <td class="px-6 py-4 text-center font-medium">${r.total}</td>
+                        <td class="px-6 py-4 text-center font-bold text-emerald-600">${r.enviadook}</td>
+                        <td class="px-6 py-4 text-center font-bold text-red-400">${r.noenviado}</td>
+                        <td class="px-6 py-4 text-center text-slate-500">$${r.monto.toFixed(2)}</td>
+                        <td class="px-6 py-4 text-center">
+                            <span class="px-2 py-1 rounded-md text-[10px] font-bold ${porc >= 80 ? 'bg-emerald-100 text-emerald-700' : 'bg-amber-100 text-amber-700'}">
+                                ${porc}%
+                            </span>
+                        </td>
+                        <td class="px-6 py-4 text-center">
+                            <button onclick="eliminarRegistro(${index})" class="text-slate-300 hover:text-red-500 transition-colors">
+                                <i class="fas fa-trash-alt"></i>
+                            </button>
+                        </td>
+                    </tr>
+                `;
+                cuerpo.innerHTML += row;
+            });
+        }
+
+        form.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const nuevo = {
+                fecha: document.getElementById('fecha').value,
+                departamento: document.getElementById('departamento').value,
+                monto: parseFloat(document.getElementById('monto').value) || 0,
+                total: parseFloat(document.getElementById('total').value) || 0,
+                enviadook: parseFloat(document.getElementById('enviadook').value) || 0,
+                noenviado: parseFloat(document.getElementById('noenviado').value) || 0,
+                factok: document.getElementById('factok').value,
+                realok: document.getElementById('realok').value,
+                resultadook: document.getElementById('resultadook').value
+            };
+
+            let db = JSON.parse(localStorage.getItem('auditData')) || [];
+            db.push(nuevo);
+            localStorage.setItem('auditData', JSON.stringify(db));
+            
+            form.reset();
+            document.getElementById('fecha').valueAsDate = new Date();
+            calcular();
+            cargarTabla();
+        });
+
+        function eliminarRegistro(idx) {
+            if(confirm("¿Eliminar este registro?")) {
+                let db = JSON.parse(localStorage.getItem('auditData')) || [];
+                // Revertimos el reverse() para borrar el correcto
+                db.reverse().splice(idx, 1);
+                db.reverse(); 
+                localStorage.setItem('auditData', JSON.stringify(db));
+                cargarTabla();
+            }
+        }
+    </script>
 </body>
 </html>

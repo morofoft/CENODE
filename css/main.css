@@ -1,55 +1,80 @@
 :root {
-    --c-accent: #0F6E56;
-    --c-accent-light: #E1F5EE;
-    --c-accent-mid: #1D9E75;
-    --c-danger: #D85A30;
-    --c-warn: #BA7517;
-    --c-success: #3B6D11;
+    --primary: #0F6E56;
+    --primary-light: #158b6d;
+    --bg-body: #f0f4f3;
+    --bg-card: #ffffff;
+    --text-main: #2d3748;
+    --text-muted: #718096;
+    --success: #27ae60;
+    --warning: #f39c12;
+    --danger: #e74c3c;
+    --shadow: 0 4px 15px rgba(0,0,0,0.05);
+    --radius: 12px;
   }
   
   body {
-    font-family: Arial, sans-serif;
+    font-family: 'Segoe UI', Roboto, sans-serif;
+    background-color: var(--bg-body);
+    color: var(--text-main);
     margin: 0;
-    background: #f8f9fa;
   }
   
+  /* Header con Estilo Moderno */
   .header {
-    background: var(--c-accent);
+    background: linear-gradient(135deg, var(--primary), var(--primary-light));
     color: white;
-    padding: 12px 20px;
+    padding: 1.5rem 2rem;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
     display: flex;
     justify-content: space-between;
+    align-items: center;
   }
   
+  /* Navegación tipo Tabs */
   .nav {
     display: flex;
+    gap: 10px;
+    padding: 1rem 2rem;
     background: white;
-    border-bottom: 1px solid #ddd;
+    border-bottom: 1px solid #e2e8f0;
   }
   
   .nav a {
-    padding: 10px 15px;
     text-decoration: none;
-    color: #555;
+    color: var(--text-muted);
+    padding: 0.6rem 1.2rem;
+    border-radius: var(--radius);
+    transition: all 0.3s;
+    font-weight: 500;
   }
   
   .nav a.active {
-    color: var(--c-accent);
-    border-bottom: 2px solid var(--c-accent);
+    background: var(--primary);
+    color: white;
   }
   
-  .content {
-    padding: 20px;
+  /* Contenedor de KPIs (Inspirado en old.html) */
+  .kpi-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 2rem;
   }
   
-  .kpi {
-    display: flex;
-    gap: 10px;
+  .kpi-card {
+    background: var(--bg-card);
+    padding: 1.5rem;
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    border-left: 5px solid var(--primary);
+    transition: transform 0.2s;
   }
   
-  .card {
-    background: white;
-    padding: 15px;
-    border-radius: 6px;
-    flex: 1;
+  .kpi-card:hover { transform: translateY(-5px); }
+  
+  .kpi-value {
+    font-size: 1.8rem;
+    font-weight: bold;
+    display: block;
+    margin-top: 5px;
   }

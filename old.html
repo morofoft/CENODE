@@ -1,0 +1,580 @@
+
+<h2 class="sr-only">CENODE Audit Portal — Dashboard de auditoría en tiempo real para departamentos médicos</h2>
+
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --c-accent: #0F6E56;
+    --c-accent-light: #E1F5EE;
+    --c-accent-mid: #1D9E75;
+    --c-danger: #D85A30;
+    --c-warn: #BA7517;
+    --c-success: #3B6D11;
+  }
+  .portal { font-size: 14px; color: var(--color-text-primary); font-family: var(--font-sans); }
+  .header { background: var(--c-accent); color: white; padding: 12px 20px; display: flex; align-items: center; justify-content: space-between; }
+  .header-title { font-size: 18px; font-weight: 500; color: white; }
+  .header-sub { font-size: 11px; opacity: 0.75; color: white; }
+  .live-badge { background: rgba(255,255,255,0.2); border: 1px solid rgba(255,255,255,0.4); border-radius: 20px; padding: 3px 10px; font-size: 11px; display: flex; align-items: center; gap: 6px; color: white; }
+  .live-dot { width: 6px; height: 6px; border-radius: 50%; background: #9FE1CB; animation: pulse 1.5s infinite; }
+  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.3} }
+  .nav { display: flex; border-bottom: 0.5px solid var(--color-border-tertiary); background: var(--color-background-primary); padding: 0 20px; }
+  .nav-btn { padding: 10px 16px; font-size: 13px; border: none; background: transparent; cursor: pointer; color: var(--color-text-secondary); border-bottom: 2px solid transparent; transition: all 0.15s; }
+  .nav-btn.active { color: var(--c-accent); border-bottom-color: var(--c-accent); font-weight: 500; }
+  .nav-btn:hover:not(.active) { color: var(--color-text-primary); background: var(--color-background-secondary); }
+  .content { padding: 16px 20px; }
+  .filter-bar { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; margin-bottom: 16px; background: var(--color-background-secondary); border: 0.5px solid var(--color-border-tertiary); border-radius: var(--border-radius-md); padding: 10px 14px; }
+  .filter-bar label { font-size: 12px; color: var(--color-text-secondary); }
+  .filter-bar input, .filter-bar select { font-size: 12px; padding: 5px 8px; border: 0.5px solid var(--color-border-tertiary); border-radius: var(--border-radius-md); background: var(--color-background-primary); color: var(--color-text-primary); height: 30px; }
+  .btn-primary { padding: 5px 14px; background: var(--c-accent); color: white; border: none; border-radius: var(--border-radius-md); font-size: 12px; cursor: pointer; height: 30px; font-weight: 500; }
+  .btn-primary:hover { background: #0a5742; }
+  .btn-sec { padding: 5px 14px; background: transparent; color: var(--c-accent); border: 0.5px solid var(--c-accent); border-radius: var(--border-radius-md); font-size: 12px; cursor: pointer; height: 30px; }
+  .kpi-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 10px; margin-bottom: 16px; }
+  .kpi-card { background: var(--color-background-secondary); border-radius: var(--border-radius-md); padding: 12px 14px; }
+  .kpi-label { font-size: 11px; color: var(--color-text-secondary); margin-bottom: 4px; }
+  .kpi-value { font-size: 22px; font-weight: 500; }
+  .kpi-sub { font-size: 11px; color: var(--color-text-secondary); margin-top: 2px; }
+  .kpi-value.green { color: var(--c-success); }
+  .kpi-value.amber { color: var(--c-warn); }
+  .kpi-value.red { color: var(--c-danger); }
+  .charts-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 16px; }
+  @media(max-width: 600px){ .charts-row { grid-template-columns: 1fr; } }
+  .chart-card { background: var(--color-background-primary); border: 0.5px solid var(--color-border-tertiary); border-radius: var(--border-radius-lg); padding: 14px; }
+  .chart-title { font-size: 12px; font-weight: 500; color: var(--color-text-secondary); margin-bottom: 10px; text-transform: uppercase; letter-spacing: 0.05em; }
+  .table-wrap { overflow-x: auto; }
+  .audit-table { width: 100%; border-collapse: collapse; font-size: 12px; }
+  .audit-table th { background: var(--color-background-secondary); color: var(--color-text-secondary); font-weight: 500; padding: 8px 10px; text-align: right; white-space: nowrap; border-bottom: 0.5px solid var(--color-border-tertiary); }
+  .audit-table th:first-child { text-align: left; }
+  .audit-table td { padding: 8px 10px; text-align: right; border-bottom: 0.5px solid var(--color-border-tertiary); }
+  .audit-table td:first-child { text-align: left; font-weight: 500; }
+  .audit-table tr:hover td { background: var(--color-background-secondary); }
+  .badge-pct { display: inline-block; padding: 2px 8px; border-radius: 10px; font-size: 11px; font-weight: 500; }
+  .pct-high { background: #EAF3DE; color: #3B6D11; }
+  .pct-mid { background: #FAEEDA; color: #854F0B; }
+  .pct-low { background: #FAECE7; color: #993C1D; }
+  .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  @media(max-width: 500px){ .form-grid { grid-column: 1fr; } }
+  .form-group { display: flex; flex-direction: column; gap: 4px; }
+  .form-group label { font-size: 12px; color: var(--color-text-secondary); font-weight: 500; }
+  .form-group input, .form-group select { padding: 7px 10px; border: 0.5px solid var(--color-border-tertiary); border-radius: var(--border-radius-md); font-size: 13px; background: var(--color-background-primary); color: var(--color-text-primary); }
+  .form-group input:focus, .form-group select:focus { outline: none; border-color: var(--c-accent); box-shadow: 0 0 0 2px rgba(29,158,117,0.15); }
+  .form-section { background: var(--color-background-primary); border: 0.5px solid var(--color-border-tertiary); border-radius: var(--border-radius-lg); padding: 16px; margin-bottom: 12px; }
+  .form-section-title { font-size: 13px; font-weight: 500; margin-bottom: 12px; padding-bottom: 8px; border-bottom: 0.5px solid var(--color-border-tertiary); color: var(--c-accent); }
+  .calc-preview { background: var(--c-accent-light); border: 0.5px solid #9FE1CB; border-radius: var(--border-radius-md); padding: 10px 14px; display: flex; gap: 20px; align-items: center; flex-wrap: wrap; margin-top: 12px; }
+  .calc-item { text-align: center; }
+  .calc-item .num { font-size: 20px; font-weight: 500; color: var(--c-accent); }
+  .calc-item .lbl { font-size: 11px; color: #0F6E56; }
+  .report-card { background: var(--color-background-primary); border: 0.5px solid var(--color-border-tertiary); border-radius: var(--border-radius-lg); padding: 14px 16px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; }
+  .report-info .report-title { font-size: 13px; font-weight: 500; }
+  .report-info .report-date { font-size: 11px; color: var(--color-text-secondary); margin-top: 2px; }
+  .toast { position: fixed; bottom: 20px; right: 20px; background: var(--c-accent); color: white; padding: 10px 18px; border-radius: var(--border-radius-md); font-size: 13px; opacity: 0; transition: opacity 0.3s; pointer-events: none; z-index: 999; }
+  .toast.show { opacity: 1; }
+  .progress-bar { height: 6px; background: var(--color-background-secondary); border-radius: 3px; overflow: hidden; margin-top: 4px; }
+  .progress-fill { height: 100%; border-radius: 3px; }
+  .section-title { font-size: 15px; font-weight: 500; margin-bottom: 14px; }
+  .section-sub { font-size: 12px; color: var(--color-text-secondary); margin-top: -10px; margin-bottom: 14px; }
+  .tab { display: none; }
+  .tab.active { display: block; }
+  .empty-state { text-align: center; padding: 40px 20px; color: var(--color-text-secondary); font-size: 13px; }
+  .empty-state .empty-icon { font-size: 32px; margin-bottom: 8px; opacity: 0.4; }
+</style>
+
+<div class="portal">
+  <div class="header">
+    <div style="display:flex;align-items:center;gap:10px;">
+      <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
+        <rect width="32" height="32" rx="8" fill="rgba(255,255,255,0.15)"/>
+        <path d="M16 6 L26 11 L26 21 L16 26 L6 21 L6 11 Z" stroke="white" stroke-width="1.5" fill="none"/>
+        <path d="M13 16 L15.5 18.5 L19 14" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+      <div>
+        <div class="header-title">CENODE Audit Portal</div>
+        <div class="header-sub">Sistema de Auditoría Médica</div>
+      </div>
+    </div>
+    <div class="live-badge">
+      <div class="live-dot"></div>
+      <span id="clock">--:--:--</span>
+    </div>
+  </div>
+
+  <div class="nav">
+    <button class="nav-btn active" onclick="showTab('dashboard',this)">Dashboard</button>
+    <button class="nav-btn" onclick="showTab('auditoria',this)">Registro de Auditoría</button>
+    <button class="nav-btn" onclick="showTab('reportes',this)">Reportes</button>
+  </div>
+
+  <!-- DASHBOARD -->
+  <div id="tab-dashboard" class="tab active content">
+    <div class="filter-bar">
+      <label>Desde:</label>
+      <input type="date" id="f-desde" />
+      <label>Hasta:</label>
+      <input type="date" id="f-hasta" />
+      <label>Departamento:</label>
+      <select id="f-dept" style="min-width:140px;"><option value="">Todos</option></select>
+      <button class="btn-primary" onclick="renderDashboard()">Aplicar</button>
+      <button class="btn-sec" onclick="resetFilter()">Limpiar</button>
+      <span id="last-update" style="margin-left:auto;font-size:11px;color:var(--color-text-secondary);"></span>
+    </div>
+
+    <div class="kpi-grid">
+      <div class="kpi-card"><div class="kpi-label">Total Registros</div><div class="kpi-value" id="kpi-total">0</div><div class="kpi-sub">procedimientos</div></div>
+      <div class="kpi-card"><div class="kpi-label">Enviado OK</div><div class="kpi-value green" id="kpi-enviado">0</div><div class="kpi-sub">completados</div></div>
+      <div class="kpi-card"><div class="kpi-label">No Enviado</div><div class="kpi-value red" id="kpi-noenviado">0</div><div class="kpi-sub">pendientes</div></div>
+      <div class="kpi-card"><div class="kpi-label">Cumplimiento</div><div class="kpi-value" id="kpi-cumplimiento">—</div><div class="kpi-sub">Enviado OK / Total</div></div>
+      <div class="kpi-card"><div class="kpi-label">Monto Total</div><div class="kpi-value amber" id="kpi-monto">$0</div><div class="kpi-sub">en auditoría</div></div>
+    </div>
+
+    <div class="charts-row">
+      <div class="chart-card">
+        <div class="chart-title">Cumplimiento por departamento (%)</div>
+        <div style="position:relative;height:260px;">
+          <canvas id="chartCumplimiento" role="img" aria-label="Cumplimiento por departamento"></canvas>
+        </div>
+      </div>
+      <div class="chart-card">
+        <div class="chart-title">Evolución diaria — Enviado OK</div>
+        <div style="position:relative;height:260px;">
+          <canvas id="chartEvolucion" role="img" aria-label="Evolución diaria de registros enviados"></canvas>
+        </div>
+      </div>
+    </div>
+
+    <div class="form-section">
+      <div class="form-section-title">Detalle por departamento</div>
+      <div class="table-wrap">
+        <table class="audit-table">
+          <thead>
+            <tr>
+              <th>Departamento</th><th>Total</th><th>Fact OK</th><th>Real OK</th>
+              <th>Resultado OK</th><th>Enviado OK</th><th>No Enviado</th><th>Monto</th><th>Cumplimiento</th>
+            </tr>
+          </thead>
+          <tbody id="dept-table-body"></tbody>
+        </table>
+      </div>
+      <div id="dept-empty" class="empty-state" style="display:none;">
+        <div class="empty-icon">📋</div>
+        <div>No hay registros para el período seleccionado.<br>Agrega auditorías desde la pestaña "Registro de Auditoría".</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- AUDITORIA -->
+  <div id="tab-auditoria" class="tab content">
+    <div class="section-title">Registro de Auditoría</div>
+    <div class="section-sub">Complete los campos para registrar una nueva auditoría</div>
+
+    <div class="form-section">
+      <div class="form-section-title">Información general</div>
+      <div class="form-grid">
+        <div class="form-group">
+          <label>Fecha de Auditoría *</label>
+          <input type="date" id="a-fecha" />
+        </div>
+        <div class="form-group">
+          <label>Departamento *</label>
+          <select id="a-dept"><option value="">-- Seleccionar --</option></select>
+        </div>
+      </div>
+    </div>
+
+    <div class="form-section">
+      <div class="form-section-title">Datos de auditoría</div>
+      <div class="form-grid">
+        <div class="form-group"><label>Total *</label><input type="number" id="a-total" min="0" placeholder="0" oninput="calcCumplimiento()" /></div>
+        <div class="form-group"><label>Fact OK</label><input type="number" id="a-factok" min="0" placeholder="0" /></div>
+        <div class="form-group"><label>Real OK</label><input type="number" id="a-realok" min="0" placeholder="0" /></div>
+        <div class="form-group"><label>Resultado OK</label><input type="number" id="a-resultok" min="0" placeholder="0" /></div>
+        <div class="form-group"><label>Enviado OK *</label><input type="number" id="a-enviadook" min="0" placeholder="0" oninput="calcCumplimiento()" /></div>
+        <div class="form-group"><label>No Enviado</label><input type="number" id="a-noenv" min="0" placeholder="0" /></div>
+        <div class="form-group" style="grid-column:1/-1;"><label>Monto ($)</label><input type="number" id="a-monto" min="0" placeholder="0.00" step="0.01" /></div>
+      </div>
+      <div class="calc-preview">
+        <div class="calc-item"><div class="num" id="calc-total">0</div><div class="lbl">Total</div></div>
+        <div style="font-size:20px;color:#1D9E75;">/</div>
+        <div class="calc-item"><div class="num" id="calc-env">0</div><div class="lbl">Enviado OK</div></div>
+        <div style="font-size:20px;color:#1D9E75;">=</div>
+        <div class="calc-item"><div class="num" id="calc-pct">0%</div><div class="lbl">Cumplimiento</div></div>
+        <div style="margin-left:auto;font-size:11px;color:#0F6E56;">Calculado automáticamente</div>
+      </div>
+    </div>
+
+    <div style="display:flex;gap:10px;justify-content:flex-end;">
+      <button class="btn-sec" onclick="clearForm()">Limpiar</button>
+      <button class="btn-primary" onclick="saveAudit()">Guardar Auditoría</button>
+    </div>
+
+    <div class="form-section" style="margin-top:16px;">
+      <div class="form-section-title">Registros guardados</div>
+      <div class="table-wrap">
+        <table class="audit-table">
+          <thead>
+            <tr><th>Fecha</th><th>Departamento</th><th>Total</th><th>Enviado OK</th><th>Monto</th><th>Cumplimiento</th><th></th></tr>
+          </thead>
+          <tbody id="recent-table-body"></tbody>
+        </table>
+      </div>
+      <div id="recent-empty" class="empty-state">
+        <div class="empty-icon">📂</div>
+        <div>Aún no hay auditorías registradas.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- REPORTES -->
+  <div id="tab-reportes" class="tab content">
+    <div class="section-title">Reportes de Auditoría</div>
+    <div class="form-section">
+      <div class="form-section-title">Generar reporte</div>
+      <div class="form-grid">
+        <div class="form-group">
+          <label>Tipo de Reporte</label>
+          <select id="r-tipo">
+            <option>Resumen por Departamento</option>
+            <option>Cumplimiento Consolidado</option>
+            <option>Montos por Departamento</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Departamento</label>
+          <select id="r-dept"><option value="">Todos</option></select>
+        </div>
+      </div>
+      <div style="display:flex;justify-content:flex-end;margin-top:12px;">
+        <button class="btn-primary" onclick="generateReport()">Generar Reporte</button>
+      </div>
+    </div>
+
+    <div id="report-output" style="display:none;" class="form-section">
+      <div class="form-section-title" id="report-output-title">Reporte</div>
+      <div id="report-output-content"></div>
+    </div>
+
+    <div class="form-section">
+      <div class="form-section-title">Historial de reportes</div>
+      <div id="report-history">
+        <div class="empty-state"><div class="empty-icon">📊</div><div>No hay reportes generados aún.</div></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<script>
+const DEPTS = ["Electrocardiograma","Glucometría","Rayos X","Mamografía","Densitometría","Sonografía","Doppler","Holter","MAPA","Ecocardiograma","Biopsia","OCT"];
+
+let auditData = [];
+let chartC = null, chartE = null;
+
+function populateSelects() {
+  ['f-dept','a-dept','r-dept'].forEach(id => {
+    const el = document.getElementById(id);
+    if (!el) return;
+    DEPTS.forEach(d => {
+      const opt = document.createElement('option');
+      opt.value = d; opt.textContent = d;
+      el.appendChild(opt);
+    });
+  });
+}
+
+function showTab(t, btn) {
+  document.querySelectorAll('.tab').forEach(el => el.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(el => el.classList.remove('active'));
+  document.getElementById('tab-' + t).classList.add('active');
+  if (btn) btn.classList.add('active');
+  if (t === 'dashboard') renderDashboard();
+  if (t === 'auditoria') renderRecent();
+}
+
+function getFilteredData() {
+  let data = [...auditData];
+  const desde = document.getElementById('f-desde').value;
+  const hasta = document.getElementById('f-hasta').value;
+  const dept = document.getElementById('f-dept').value;
+  if (desde) data = data.filter(r => r.fecha >= desde);
+  if (hasta) data = data.filter(r => r.fecha <= hasta);
+  if (dept) data = data.filter(r => r.departamento === dept);
+  return data;
+}
+
+function resetFilter() {
+  document.getElementById('f-desde').value = '';
+  document.getElementById('f-hasta').value = '';
+  document.getElementById('f-dept').value = '';
+  renderDashboard();
+}
+
+function renderDashboard() {
+  const data = getFilteredData();
+  const total = data.reduce((s,r) => s + r.total, 0);
+  const env = data.reduce((s,r) => s + r.enviadook, 0);
+  const noenv = data.reduce((s,r) => s + r.noenv, 0);
+  const monto = data.reduce((s,r) => s + r.monto, 0);
+  const pct = total > 0 ? Math.round((env / total) * 100) : null;
+
+  document.getElementById('kpi-total').textContent = total.toLocaleString();
+  document.getElementById('kpi-enviado').textContent = env.toLocaleString();
+  document.getElementById('kpi-noenviado').textContent = noenv.toLocaleString();
+  document.getElementById('kpi-cumplimiento').textContent = pct !== null ? pct + '%' : '—';
+  document.getElementById('kpi-cumplimiento').className = 'kpi-value ' + (pct === null ? '' : pct >= 80 ? 'green' : pct >= 60 ? 'amber' : 'red');
+  document.getElementById('kpi-monto').textContent = '$' + monto.toLocaleString('en-US', {maximumFractionDigits: 0});
+  document.getElementById('last-update').textContent = 'Actualizado: ' + new Date().toLocaleTimeString();
+
+  renderDeptTable(data);
+  renderCharts(data);
+}
+
+function renderDeptTable(data) {
+  const deptMap = {};
+  DEPTS.forEach(d => { deptMap[d] = {total:0,factok:0,realok:0,resultok:0,enviadook:0,noenv:0,monto:0}; });
+  data.forEach(r => {
+    const dm = deptMap[r.departamento];
+    if (!dm) return;
+    dm.total += r.total; dm.factok += r.factok; dm.realok += r.realok;
+    dm.resultok += r.resultok; dm.enviadook += r.enviadook; dm.noenv += r.noenv; dm.monto += r.monto;
+  });
+
+  const tbody = document.getElementById('dept-table-body');
+  tbody.innerHTML = '';
+  let hasRows = false;
+  DEPTS.forEach(d => {
+    const dm = deptMap[d];
+    if (dm.total === 0) return;
+    hasRows = true;
+    const pct = Math.round((dm.enviadook / dm.total) * 100);
+    const cls = pct >= 80 ? 'pct-high' : pct >= 60 ? 'pct-mid' : 'pct-low';
+    const fillColor = pct >= 80 ? '#3B6D11' : pct >= 60 ? '#BA7517' : '#D85A30';
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td>${d}</td>
+      <td>${dm.total.toLocaleString()}</td>
+      <td>${dm.factok.toLocaleString()}</td>
+      <td>${dm.realok.toLocaleString()}</td>
+      <td>${dm.resultok.toLocaleString()}</td>
+      <td>${dm.enviadook.toLocaleString()}</td>
+      <td>${dm.noenv.toLocaleString()}</td>
+      <td>$${dm.monto.toLocaleString('en-US',{maximumFractionDigits:0})}</td>
+      <td>
+        <span class="badge-pct ${cls}">${pct}%</span>
+        <div class="progress-bar" style="width:60px;display:inline-block;vertical-align:middle;margin-left:4px;">
+          <div class="progress-fill" style="width:${pct}%;background:${fillColor}"></div>
+        </div>
+      </td>`;
+    tbody.appendChild(tr);
+  });
+  document.getElementById('dept-empty').style.display = hasRows ? 'none' : 'block';
+}
+
+function renderCharts(data) {
+  const deptMap = {};
+  DEPTS.forEach(d => { deptMap[d] = {total:0,enviadook:0}; });
+  data.forEach(r => {
+    if (deptMap[r.departamento]) {
+      deptMap[r.departamento].total += r.total;
+      deptMap[r.departamento].enviadook += r.enviadook;
+    }
+  });
+
+  const deptLabels = DEPTS.filter(d => deptMap[d].total > 0);
+  const deptPcts = deptLabels.map(d => {
+    const dm = deptMap[d];
+    return dm.total > 0 ? Math.round((dm.enviadook / dm.total) * 100) : 0;
+  });
+  const colors = deptPcts.map(p => p >= 80 ? '#3B6D11' : p >= 60 ? '#BA7517' : '#D85A30');
+
+  if (chartC) chartC.destroy();
+  chartC = new Chart(document.getElementById('chartCumplimiento'), {
+    type: 'bar',
+    data: {
+      labels: deptLabels.length ? deptLabels.map(d => d.length > 9 ? d.substr(0,9)+'…' : d) : ['Sin datos'],
+      datasets: [{
+        label: 'Cumplimiento %',
+        data: deptLabels.length ? deptPcts : [0],
+        backgroundColor: deptLabels.length ? colors : ['#ccc'],
+        borderRadius: 4
+      }]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: { legend: { display: false } },
+      scales: {
+        y: { min:0, max:100, ticks:{ callback: v => v+'%', font:{size:10} }, grid:{color:'rgba(0,0,0,0.05)'} },
+        x: { ticks:{ font:{size:9} }, grid:{display:false} }
+      }
+    }
+  });
+
+  const dateMap = {};
+  data.forEach(r => { dateMap[r.fecha] = (dateMap[r.fecha] || 0) + r.enviadook; });
+  const sortedDates = Object.keys(dateMap).sort().slice(-14);
+
+  if (chartE) chartE.destroy();
+  chartE = new Chart(document.getElementById('chartEvolucion'), {
+    type: 'line',
+    data: {
+      labels: sortedDates.length ? sortedDates.map(d => d.substr(5)) : ['Sin datos'],
+      datasets: [{
+        label: 'Enviado OK',
+        data: sortedDates.length ? sortedDates.map(d => dateMap[d]) : [0],
+        borderColor: '#0F6E56',
+        backgroundColor: 'rgba(15,110,86,0.08)',
+        fill: true, tension: 0.4, pointRadius: 3
+      }]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: { legend: { display: false } },
+      scales: {
+        y: { ticks:{ font:{size:10} }, grid:{color:'rgba(0,0,0,0.05)'} },
+        x: { ticks:{ font:{size:9}, autoSkip: false, maxRotation: 45 }, grid:{display:false} }
+      }
+    }
+  });
+}
+
+function calcCumplimiento() {
+  const total = parseInt(document.getElementById('a-total').value) || 0;
+  const env = parseInt(document.getElementById('a-enviadook').value) || 0;
+  const pct = total > 0 ? Math.round((env / total) * 100) : 0;
+  document.getElementById('calc-total').textContent = total;
+  document.getElementById('calc-env').textContent = env;
+  document.getElementById('calc-pct').textContent = pct + '%';
+}
+
+function clearForm() {
+  ['a-fecha','a-dept','a-total','a-factok','a-realok','a-resultok','a-enviadook','a-noenv','a-monto'].forEach(id => {
+    document.getElementById(id).value = '';
+  });
+  document.getElementById('a-dept').value = '';
+  calcCumplimiento();
+}
+
+function saveAudit() {
+  const dept = document.getElementById('a-dept').value;
+  const fecha = document.getElementById('a-fecha').value;
+  const total = parseInt(document.getElementById('a-total').value) || 0;
+  const enviadook = parseInt(document.getElementById('a-enviadook').value) || 0;
+  if (!dept || !fecha || total === 0) { showToast('Complete los campos obligatorios (*)'); return; }
+  const record = {
+    id: Date.now().toString(36),
+    fecha, departamento: dept, total,
+    factok: parseInt(document.getElementById('a-factok').value) || 0,
+    realok: parseInt(document.getElementById('a-realok').value) || 0,
+    resultok: parseInt(document.getElementById('a-resultok').value) || 0,
+    enviadook,
+    noenv: parseInt(document.getElementById('a-noenv').value) || 0,
+    monto: parseFloat(document.getElementById('a-monto').value) || 0,
+    cumplimiento: total > 0 ? parseFloat(((enviadook / total) * 100).toFixed(1)) : 0
+  };
+  auditData.unshift(record);
+  clearForm();
+  renderRecent();
+  showToast('Auditoría guardada correctamente');
+}
+
+function deleteRecord(id) {
+  auditData = auditData.filter(r => r.id !== id);
+  renderRecent();
+  if (document.getElementById('tab-dashboard').classList.contains('active')) renderDashboard();
+  showToast('Registro eliminado');
+}
+
+function renderRecent() {
+  const tbody = document.getElementById('recent-table-body');
+  tbody.innerHTML = '';
+  const emptyEl = document.getElementById('recent-empty');
+  if (auditData.length === 0) { emptyEl.style.display = 'block'; return; }
+  emptyEl.style.display = 'none';
+  auditData.slice(0, 30).forEach(r => {
+    const pct = r.cumplimiento;
+    const cls = pct >= 80 ? 'pct-high' : pct >= 60 ? 'pct-mid' : 'pct-low';
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td>${r.fecha}</td>
+      <td>${r.departamento}</td>
+      <td>${r.total}</td>
+      <td>${r.enviadook}</td>
+      <td>$${r.monto.toLocaleString('en-US',{maximumFractionDigits:0})}</td>
+      <td><span class="badge-pct ${cls}">${pct}%</span></td>
+      <td><button onclick="deleteRecord('${r.id}')" style="background:none;border:none;cursor:pointer;color:var(--color-text-secondary);font-size:13px;padding:2px 6px;">✕</button></td>`;
+    tbody.appendChild(tr);
+  });
+}
+
+function generateReport() {
+  const tipo = document.getElementById('r-tipo').value;
+  const dept = document.getElementById('r-dept').value;
+  let data = dept ? auditData.filter(r => r.departamento === dept) : [...auditData];
+
+  const output = document.getElementById('report-output');
+  const title = document.getElementById('report-output-title');
+  const content = document.getElementById('report-output-content');
+
+  if (data.length === 0) { showToast('No hay datos para generar el reporte'); return; }
+
+  output.style.display = 'block';
+  title.textContent = tipo;
+
+  const deptMap = {};
+  DEPTS.forEach(d => { deptMap[d] = {total:0,enviadook:0,noenv:0,monto:0,count:0}; });
+  data.forEach(r => {
+    if (!deptMap[r.departamento]) return;
+    deptMap[r.departamento].total += r.total;
+    deptMap[r.departamento].enviadook += r.enviadook;
+    deptMap[r.departamento].noenv += r.noenv;
+    deptMap[r.departamento].monto += r.monto;
+    deptMap[r.departamento].count++;
+  });
+
+  let html = '<div class="table-wrap"><table class="audit-table"><thead><tr><th>Departamento</th><th>Registros</th><th>Total</th><th>Enviado OK</th><th>No Enviado</th><th>Monto</th><th>Cumplimiento</th></tr></thead><tbody>';
+  let hasRows = false;
+  DEPTS.forEach(d => {
+    const dm = deptMap[d];
+    if (dm.total === 0) return;
+    hasRows = true;
+    const pct = Math.round((dm.enviadook / dm.total) * 100);
+    const cls = pct >= 80 ? 'pct-high' : pct >= 60 ? 'pct-mid' : 'pct-low';
+    html += `<tr><td>${d}</td><td>${dm.count}</td><td>${dm.total.toLocaleString()}</td><td>${dm.enviadook.toLocaleString()}</td><td>${dm.noenv.toLocaleString()}</td><td>$${dm.monto.toLocaleString('en-US',{maximumFractionDigits:0})}</td><td><span class="badge-pct ${cls}">${pct}%</span></td></tr>`;
+  });
+  html += '</tbody></table></div>';
+  content.innerHTML = hasRows ? html : '<div class="empty-state"><div>No hay datos disponibles.</div></div>';
+
+  const histEl = document.getElementById('report-history');
+  const firstChild = histEl.querySelector('.empty-state');
+  if (firstChild) firstChild.remove();
+
+  const entry = document.createElement('div');
+  entry.className = 'report-card';
+  entry.innerHTML = `
+    <div class="report-info">
+      <div class="report-title">${tipo}${dept ? ' — ' + dept : ''}</div>
+      <div class="report-date">Generado: ${new Date().toLocaleString()}</div>
+    </div>
+    <div><button class="btn-sec" onclick="this.closest('.report-card').remove()">Eliminar</button></div>`;
+  histEl.prepend(entry);
+  showToast('Reporte generado');
+}
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2500);
+}
+
+function updateClock() {
+  document.getElementById('clock').textContent = new Date().toLocaleTimeString();
+}
+
+populateSelects();
+document.getElementById('a-fecha').value = new Date().toISOString().split('T')[0];
+renderDashboard();
+renderRecent();
+setInterval(updateClock, 1000);
+updateClock();
+</script>

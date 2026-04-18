@@ -1,0 +1,55 @@
+:root {
+    --c-accent: #0F6E56;
+    --c-accent-light: #E1F5EE;
+    --c-accent-mid: #1D9E75;
+    --c-danger: #D85A30;
+    --c-warn: #BA7517;
+    --c-success: #3B6D11;
+  }
+  
+  body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    background: #f8f9fa;
+  }
+  
+  .header {
+    background: var(--c-accent);
+    color: white;
+    padding: 12px 20px;
+    display: flex;
+    justify-content: space-between;
+  }
+  
+  .nav {
+    display: flex;
+    background: white;
+    border-bottom: 1px solid #ddd;
+  }
+  
+  .nav a {
+    padding: 10px 15px;
+    text-decoration: none;
+    color: #555;
+  }
+  
+  .nav a.active {
+    color: var(--c-accent);
+    border-bottom: 2px solid var(--c-accent);
+  }
+  
+  .content {
+    padding: 20px;
+  }
+  
+  .kpi {
+    display: flex;
+    gap: 10px;
+  }
+  
+  .card {
+    background: white;
+    padding: 15px;
+    border-radius: 6px;
+    flex: 1;
+  }

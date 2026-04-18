@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Dashboard</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <link rel="stylesheet" href="css/main.css">
+</head>
+
+<body onload="initDashboard()">
+
+<div class="header">
+  <h2>CENODE Dashboard</h2>
+</div>
+
+<div class="nav">
+  <a href="index.html" class="active">Dashboard</a>
+  <a href="registro.html">Registro</a>
+  <a href="reporte.html">Reportes</a>
+</div>
+
+<div class="content">
+
+  <!-- 🔎 FILTROS -->
+  <div class="card" style="margin-bottom:15px;">
+    <label>Desde:</label>
+    <input type="date" id="f-desde">
+
+    <label>Hasta:</label>
+    <input type="date" id="f-hasta">
+
+    <label>Departamento:</label>
+    <select id="f-dept">
+      <option value="">Todos</option>
+    </select>
+
+    <button onclick="renderDashboard()">Aplicar</button>
+    <button onclick="resetFilters()">Limpiar</button>
+  </div>
+
+  <!-- 📊 KPIs -->
+  <div class="kpi">
+
+    <div class="card">
+      <h4>Total registros</h4>
+      <div id="kpi-total">0</div>
+      <small>procedimientos</small>
+    </div>
+
+    <div class="card">
+      <h4>Enviados OK</h4>
+      <div id="kpi-env">0</div>
+      <small>completados</small>
+    </div>
+
+    <div class="card">
+      <h4>No enviado</h4>
+      <div id="kpi-noenv">0</div>
+      <small>pendientes</small>
+    </div>
+
+    <div class="card">
+      <h4>Cumplimiento</h4>
+      <div id="kpi-pct">0%</div>
+      <small>Enviado OK / Total</small>
+    </div>
+
+    <div class="card">
+      <h4>Monto total</h4>
+      <div id="kpi-monto">$0</div>
+      <small>en auditoría</small>
+    </div>
+
+    
+
+  </div>
+
+  <div class="card" style="margin-top:20px;">
+    <h3>Cumplimiento por Departamento</h3>
+    <canvas id="chartDept" height="120"></canvas>
+  </div>
+  
+  <div class="card" style="margin-top:20px;">
+    <h3>Evolución diaria (Enviado OK)</h3>
+    <canvas id="chartEvolucion" height="120"></canvas>
+  </div>
+
+</div>
+
+<script src="js/main.js"></script>
+</body>
+</html>

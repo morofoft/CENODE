@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Registro de Auditoría</title>
+  <link rel="stylesheet" href="css/main.css">
+</head>
+
+<body onload="initRegistro()">
+
+<div class="header">
+  <h2>Registro de Auditoría</h2>
+</div>
+
+<div class="nav">
+  <a href="index.html">Dashboard</a>
+  <a href="registro.html" class="active">Registro</a>
+  <a href="reporte.html">Reportes</a>
+</div>
+
+<div class="content">
+    <div class="form-section">
+
+        <h3>Información general</h3>
+      
+        <div class="form-grid">
+          <div class="form-group">
+            <label>Fecha de Auditoría *</label>
+            <input type="date" id="fecha">
+          </div>
+      
+          <div class="form-group">
+            <label>Departamento *</label>
+            <select id="dept">
+              <option value="">-- Seleccionar --</option>
+            </select>
+          </div>
+        </div>
+      
+      </div>
+      
+      
+      <div class="form-section">
+      
+        <h3>Datos de auditoría</h3>
+      
+        <div class="form-grid">
+      
+          <div class="form-group">
+            <label>Total *</label>
+            <input type="number" id="total" min="0" oninput="previewCalc()">
+          </div>
+      
+          <div class="form-group">
+            <label>Fact OK</label>
+            <input type="number" id="factok" min="0">
+          </div>
+      
+          <div class="form-group">
+            <label>Real OK</label>
+            <input type="number" id="realok" min="0">
+          </div>
+      
+          <div class="form-group">
+            <label>Resultado OK</label>
+            <input type="number" id="resultok" min="0">
+          </div>
+      
+          <div class="form-group">
+            <label>Enviado OK *</label>
+            <input type="number" id="env" min="0" oninput="previewCalc()">
+          </div>
+      
+          <div class="form-group">
+            <label>No Enviado</label>
+            <input type="number" id="noenv" min="0">
+          </div>
+      
+          <div class="form-group" style="grid-column:1/-1;">
+            <label>Monto ($)</label>
+            <input type="number" id="monto" step="0.01">
+          </div>
+      
+        </div>
+      
+        <!-- 🔢 PREVIEW EXACTO -->
+        <div class="calc-preview">
+          <div>
+            <div id="p-total">0</div>
+            <small>Total</small>
+          </div>
+      
+          <div>/</div>
+      
+          <div>
+            <div id="p-env">0</div>
+            <small>Enviado OK</small>
+          </div>
+      
+          <div>=</div>
+      
+          <div>
+            <div id="p-pct">0%</div>
+            <small>Cumplimiento</small>
+          </div>
+      
+          <div style="margin-left:auto;font-size:12px;">
+            Calculado automáticamente
+          </div>
+        </div>
+      
+      </div>
+      
+      
+      <div style="display:flex;justify-content:flex-end;gap:10px;">
+        <button onclick="clearForm()">Limpiar</button>
+        <button onclick="saveAudit()">Guardar Auditoría</button>
+      </div>
+
+  <!-- 📋 LISTADO -->
+  <div class="form-section" style="margin-top:16px;">
+    <h3>Registros guardados</h3>
+  
+    <table class="audit-table">
+      <thead>
+        <tr>
+          <th>Fecha</th>
+          <th>Departamento</th>
+          <th>Total</th>
+          <th>Enviado OK</th>
+          <th>Monto</th>
+          <th>Cumplimiento</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody id="recent-table-body"></tbody>
+    </table>
+  
+    <div id="recent-empty" class="empty-state">
+      No hay auditorías registradas.
+    </div>
+  </div>
+
+</div>
+
+<script src="js/main.js"></script>
+</body>
+</html>

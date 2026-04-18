@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Reportes</title>
+  <link rel="stylesheet" href="css/main.css">
+</head>
+
+<body onload="initReportes()">
+
+<div class="header">
+  <h2>Reportes de Auditoría</h2>
+</div>
+
+<div class="nav">
+  <a href="index.html">Dashboard</a>
+  <a href="registro.html">Registro</a>
+  <a href="reporte.html" class="active">Reportes</a>
+</div>
+
+<div class="content">
+
+  <!-- FILTROS -->
+  <div class="card">
+    <label>Departamento</label>
+    <select id="r-dept">
+      <option value="">Todos</option>
+    </select>
+
+    <button onclick="generateReport()">Generar Reporte</button>
+  </div>
+
+  <!-- KPIs -->
+  <div class="kpi" style="margin-top:15px;">
+    <div class="card">
+      <h4>Total</h4>
+      <div id="r-total">0</div>
+    </div>
+
+    <div class="card">
+      <h4>Enviado OK</h4>
+      <div id="r-env">0</div>
+    </div>
+
+    <div class="card">
+      <h4>Cumplimiento</h4>
+      <div id="r-pct">0%</div>
+    </div>
+
+    <div class="card">
+      <h4>Monto</h4>
+      <div id="r-monto">$0</div>
+    </div>
+  </div>
+
+  <!-- TABLA -->
+  <div class="card" style="margin-top:20px;">
+    <h3>Resumen por Departamento</h3>
+    <div id="report-table"></div>
+  </div>
+
+</div>
+
+<script src="js/main.js"></script>
+</body>
+</html>

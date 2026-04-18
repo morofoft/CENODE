@@ -11,21 +11,20 @@
 <body class="bg-slate-50 text-slate-800 font-sans" onload="initDashboard()">
 
     <header class="bg-emerald-800 text-white shadow-lg">
-        <div class="max-w-7xl mx-auto px-4 py-4 flex justify-between items-center">
+        <div class="max-w-7xl mx-auto px-4 py-3 flex justify-between items-center">
             <div class="flex items-center gap-3">
-                <div class="bg-white p-2 rounded-lg text-emerald-800 text-xl font-bold">
-                    <i class="fas fa-chart-line"></i>
+                <div class="h-10 w-10 md:h-12 md:w-12 bg-white rounded-xl overflow-hidden shadow-inner flex items-center justify-center">
+                    <img src="img/logo-cenode.webp" alt="Logo CENODE" class="h-full w-full object-contain p-1">
                 </div>
-                <div>
-                    <h1 class="text-xl font-bold leading-tight">CENODE</h1>
-                    <p class="text-xs text-emerald-200 uppercase tracking-tighter">Panel de Control Gerencial</p>
+                <div class="flex flex-col">
+                    <span class="text-xl md:text-2xl font-black leading-none tracking-tight">CENODE</span>
+                    <span class="text-[10px] md:text-[11px] uppercase font-bold text-emerald-300 tracking-[0.2em] leading-tight">Audit System</span>
                 </div>
             </div>
             <div class="flex items-center gap-4">
-                <span class="text-sm bg-emerald-700/50 px-3 py-1 rounded-full border border-emerald-600 flex items-center gap-2">
-                    <span class="h-2 w-2 rounded-full bg-emerald-400 animate-pulse"></span>
-                    En Línea
-                </span>
+                <a href="data.html" class="text-emerald-200 hover:text-white transition-colors text-xl">
+                    <i class="fas fa-cog"></i>
+                </a>
             </div>
         </div>
     </header>
@@ -42,58 +41,87 @@
                 <i class="fas fa-file-alt"></i> Reportes
             </a>
             <a href="usuarios.html" class="py-4 px-2 text-slate-500 hover:text-emerald-600 transition-colors flex items-center gap-2">
-              <i class="fas fa-user-alt"></i> Usuarios
-          </a>
+                <i class="fas fa-user-alt"></i> Usuarios
+            </a>
         </div>
     </nav>
 
     <main class="max-w-7xl mx-auto px-4 py-8 space-y-8">
+
+        <div class="bg-white p-4 rounded-3xl shadow-sm border border-slate-100 flex flex-wrap gap-4 items-end">
+            <div class="flex-1 min-w-[200px]">
+                <label class="block text-[10px] font-bold text-slate-400 uppercase mb-1 ml-1">Desde</label>
+                <input type="date" id="filter-desde" onchange="updateDashboard()" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2 text-sm focus:ring-2 focus:ring-emerald-500 outline-none">
+            </div>
+            <div class="flex-1 min-w-[200px]">
+                <label class="block text-[10px] font-bold text-slate-400 uppercase mb-1 ml-1">Hasta</label>
+                <input type="date" id="filter-hasta" onchange="updateDashboard()" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2 text-sm focus:ring-2 focus:ring-emerald-500 outline-none">
+            </div>
+            <div class="flex-1 min-w-[200px]">
+                <label class="block text-[10px] font-bold text-slate-400 uppercase mb-1 ml-1">Departamento</label>
+                <select id="filter-dept" onchange="updateDashboard()" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2 text-sm focus:ring-2 focus:ring-emerald-500 outline-none">
+                    <option value="todos">Todos los departamentos</option>
+                    <option value="Electrocardiograma">Electrocardiograma</option>
+                    <option value="Glucometría">Glucometría</option>
+                    <option value="Rayos x">Rayos x</option>
+                    <option value="Mamografía">Mamografía</option>
+                    <option value="Densitometría">Densitometría</option>
+                    <option value="Sonografía">Sonografía</option>
+                    <option value="Doppler">Doppler</option>
+                    <option value="Holter">Holter</option>
+                    <option value="MAPA">MAPA</option>
+                    <option value="Ecocardiograma">Ecocardiograma</option>
+                    <option value="Biopsia">Biopsia</option>
+                    <option value="OCT">OCT</option>
+                    <option value="Laboratorio">Laboratorio</option>
+                    <option value="Campimetria">Campimetria</option>
+                    <option value="Microscopia">Microscopia</option>
+                    <option value="Paquimetria">Paquimetria</option>
+                    <option value="Biometria">Biometria</option>
+                    <option value="Angiografia">Angiografia</option>
+                </select>
+            </div>
+            <button onclick="resetFilters()" class="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-600 rounded-xl text-sm font-bold transition-colors">
+                <i class="fas fa-undo"></i>
+            </button>
+        </div>
         
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            <div class="bg-white p-6 rounded-3xl shadow-sm border border-slate-100 transition-transform hover:scale-[1.02]">
+            <div class="bg-white p-6 rounded-3xl shadow-sm border border-slate-100">
                 <p class="text-xs font-bold text-slate-400 uppercase mb-1">Total Auditorías</p>
                 <h3 id="kpi-total" class="text-3xl font-black text-slate-800">0</h3>
-                <p class="text-[10px] text-emerald-500 mt-2"><i class="fas fa-sync"></i> Datos actualizados</p>
             </div>
-            <div class="bg-white p-6 rounded-3xl shadow-sm border border-slate-100 transition-transform hover:scale-[1.02]">
+            <div class="bg-white p-6 rounded-3xl shadow-sm border border-slate-100">
                 <p class="text-xs font-bold text-slate-400 uppercase mb-1">Cumplimiento Global</p>
                 <h3 id="kpi-cumplimiento" class="text-3xl font-black text-emerald-600">0%</h3>
                 <div class="w-full bg-slate-100 h-1.5 mt-3 rounded-full overflow-hidden">
-                    <div id="kpi-bar" class="bg-emerald-500 h-full" style="width: 0%"></div>
+                    <div id="kpi-bar" class="bg-emerald-500 h-full w-0 transition-all duration-500"></div>
                 </div>
             </div>
-            <div class="bg-white p-6 rounded-3xl shadow-sm border border-slate-100 transition-transform hover:scale-[1.02]">
+            <div class="bg-white p-6 rounded-3xl shadow-sm border border-slate-100">
                 <p class="text-xs font-bold text-slate-400 uppercase mb-1">Total Enviados</p>
                 <h3 id="kpi-enviados" class="text-3xl font-black text-slate-800">0</h3>
-                <p class="text-[10px] text-slate-400 mt-2 italic">Casos cerrados OK</p>
             </div>
-            <div class="bg-emerald-800 p-6 rounded-3xl shadow-lg shadow-emerald-900/20 text-white transition-transform hover:scale-[1.02]">
+            <div class="bg-emerald-800 p-6 rounded-3xl text-white shadow-lg">
                 <p class="text-xs font-bold opacity-70 uppercase mb-1">Monto Generado</p>
                 <h3 id="kpi-monto" class="text-3xl font-black">$0.00</h3>
-                <p class="text-[10px] opacity-70 mt-2 font-mono italic text-emerald-100">Cierre acumulado</p>
             </div>
         </div>
 
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
             <div class="bg-white p-8 rounded-3xl shadow-sm border border-slate-100">
-                <div class="flex items-center justify-between mb-6">
-                    <h4 class="font-bold text-slate-700 flex items-center gap-2">
-                        <i class="fas fa-chart-bar text-emerald-600"></i> Desempeño por Departamento
-                    </h4>
-                </div>
+                <h4 class="font-bold text-slate-700 mb-6 flex items-center gap-2">
+                    <i class="fas fa-chart-bar text-emerald-600"></i> Desempeño por Departamento
+                </h4>
                 <canvas id="chartDept" height="250"></canvas>
             </div>
-
             <div class="bg-white p-8 rounded-3xl shadow-sm border border-slate-100">
-                <div class="flex items-center justify-between mb-6">
-                    <h4 class="font-bold text-slate-700 flex items-center gap-2">
-                        <i class="fas fa-chart-line text-emerald-600"></i> Tendencia de Envío (Histórico)
-                    </h4>
-                </div>
+                <h4 class="font-bold text-slate-700 mb-6 flex items-center gap-2">
+                    <i class="fas fa-chart-line text-emerald-600"></i> Tendencia de Envío
+                </h4>
                 <canvas id="chartEvol" height="250"></canvas>
             </div>
         </div>
-
     </main>
 
     <script>
@@ -101,19 +129,41 @@
         let chartEvol = null;
 
         function initDashboard() {
-            const data = JSON.parse(localStorage.getItem('auditData')) || [];
+            // Establecer fechas por defecto (mes actual)
+            const hoy = new Date();
+            const haceMes = new Date();
+            haceMes.setMonth(hoy.getMonth() - 1);
             
-            if (data.length === 0) {
-                console.log("No hay datos para mostrar.");
-                return;
-            }
+            document.getElementById('filter-hasta').value = hoy.toISOString().split('T')[0];
+            document.getElementById('filter-desde').value = haceMes.toISOString().split('T')[0];
+            
+            updateDashboard();
+        }
 
-            // 1. Calcular KPIs
+        function resetFilters() {
+            initDashboard();
+            document.getElementById('filter-dept').value = 'todos';
+        }
+
+        function updateDashboard() {
+            const data = JSON.parse(localStorage.getItem('auditData')) || [];
+            const desde = document.getElementById('filter-desde').value;
+            const hasta = document.getElementById('filter-hasta').value;
+            const depto = document.getElementById('filter-dept').value;
+
+            // --- FILTRADO LÓGICO ---
+            const filteredData = data.filter(r => {
+                const matchFecha = (!desde || r.fecha >= desde) && (!hasta || r.fecha <= hasta);
+                const matchDepto = depto === 'todos' || r.departamento === depto;
+                return matchFecha && matchDepto;
+            });
+
+            // 1. Recalcular KPIs
             let totalProc = 0, totalEnv = 0, totalMonto = 0;
-            data.forEach(r => {
-                totalProc += r.total;
-                totalEnv += r.enviadook;
-                totalMonto += r.monto;
+            filteredData.forEach(r => {
+                totalProc += Number(r.total);
+                totalEnv += Number(r.enviadook);
+                totalMonto += Number(r.monto);
             });
 
             document.getElementById('kpi-total').innerText = totalProc;
@@ -124,24 +174,21 @@
             document.getElementById('kpi-cumplimiento').innerText = porcGlobal + "%";
             document.getElementById('kpi-bar').style.width = porcGlobal + "%";
 
-            // 2. Procesar Datos para Gráfica de Barras (Por Departamento)
+            // 2. Procesar Gráfica Deptos
             const deptMap = {};
-            data.forEach(r => {
+            filteredData.forEach(r => {
                 if (!deptMap[r.departamento]) deptMap[r.departamento] = { t: 0, e: 0 };
-                deptMap[r.departamento].t += r.total;
-                deptMap[r.departamento].e += r.enviadook;
+                deptMap[r.departamento].t += Number(r.total);
+                deptMap[r.departamento].e += Number(r.enviadook);
             });
-
             const labelsDept = Object.keys(deptMap);
-            const valuesDept = labelsDept.map(d => 
-                deptMap[d].t > 0 ? Math.round((deptMap[d].e / deptMap[d].t) * 100) : 0
-            );
+            const valuesDept = labelsDept.map(d => deptMap[d].t > 0 ? Math.round((deptMap[d].e / deptMap[d].t) * 100) : 0);
 
-            // 3. Procesar Datos para Gráfica de Evolución (Por Fecha)
+            // 3. Procesar Gráfica Evolución
             const dateMap = {};
-            data.forEach(r => {
+            filteredData.forEach(r => {
                 if (!dateMap[r.fecha]) dateMap[r.fecha] = 0;
-                dateMap[r.fecha] += r.enviadook;
+                dateMap[r.fecha] += Number(r.enviadook);
             });
             const labelsFechas = Object.keys(dateMap).sort();
             const valuesFechas = labelsFechas.map(f => dateMap[f]);
@@ -149,50 +196,43 @@
             renderCharts(labelsDept, valuesDept, labelsFechas, valuesFechas);
         }
 
-        function renderCharts(labelsDept, valuesDept, labelsFechas, valuesFechas) {
+        function renderCharts(lDept, vDept, lFech, vFech) {
+            if (chartDept) chartDept.destroy();
+            if (chartEvol) chartEvol.destroy();
+
             const ctx1 = document.getElementById('chartDept').getContext('2d');
             const ctx2 = document.getElementById('chartEvol').getContext('2d');
 
-            // Gráfica de Barras
             chartDept = new Chart(ctx1, {
                 type: 'bar',
                 data: {
-                    labels: labelsDept,
+                    labels: lDept,
                     datasets: [{
                         label: '% Cumplimiento',
-                        data: valuesDept,
+                        data: vDept,
                         backgroundColor: 'rgba(16, 185, 129, 0.2)',
                         borderColor: '#10b981',
                         borderWidth: 2,
                         borderRadius: 12
                     }]
                 },
-                options: {
-                    responsive: true,
-                    scales: { y: { min: 0, max: 100, ticks: { callback: v => v + '%' } } }
-                }
+                options: { responsive: true, scales: { y: { min: 0, max: 100 } } }
             });
 
-            // Gráfica de Línea
             chartEvol = new Chart(ctx2, {
                 type: 'line',
                 data: {
-                    labels: labelsFechas,
+                    labels: lFech,
                     datasets: [{
-                        label: 'Total Enviados',
-                        data: valuesFechas,
+                        label: 'Enviados OK',
+                        data: vFech,
                         borderColor: '#065f46',
                         backgroundColor: 'rgba(6, 95, 70, 0.1)',
                         fill: true,
-                        tension: 0.4,
-                        pointRadius: 6,
-                        pointBackgroundColor: '#fff',
-                        pointBorderWidth: 3
+                        tension: 0.4
                     }]
                 },
-                options: {
-                    responsive: true
-                }
+                options: { responsive: true }
             });
         }
     </script>

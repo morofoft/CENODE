@@ -31,7 +31,7 @@
             <p class="text-slate-500 text-sm mb-6">Hemos detectado información guardada en este navegador. ¿Qué deseas hacer con los nuevos datos?</p>
             <div class="flex flex-col gap-3">
                 <button onclick="procesarImportacion('merge')" class="bg-emerald-100 text-emerald-700 font-bold py-3 rounded-xl hover:bg-emerald-200 transition-all flex items-center justify-center gap-2">
-                    <i class="fas fa-object-group"></i> Combinar (Mantener ambos)
+                    <i class="fas fa-object-group"></i> Combinar (Sin duplicados)
                 </button>
                 <button onclick="procesarImportacion('replace')" class="bg-slate-800 text-white font-bold py-3 rounded-xl hover:bg-slate-900 transition-all flex items-center justify-center gap-2">
                     <i class="fas fa-sync-alt"></i> Reemplazar (Borrar actuales)
@@ -121,18 +121,39 @@
         }
 
         function procesarImportacion(modo) {
-            let actuales = JSON.parse(localStorage.getItem('auditData')) || [];
-            
-            if(modo === 'merge') {
-                const combinados = [...actuales, ...datosAImportar];
-                localStorage.setItem('auditData', JSON.stringify(combinados));
-            } else {
-                localStorage.setItem('auditData', JSON.stringify(datosAImportar));
-            }
+    let actuales = JSON.parse(localStorage.getItem('auditData')) || [];
+    
+    if (modo === 'merge') {
+        // --- LÓGICA ANTI-DUPLICADOS ---
+        // Creamos un set de "llaves" existentes (Fecha + Depto) para comparar rápido
+        const llavesExistentes = new Set(actuales.map(r => `${r.fecha}-${r.departamento}`));
+        
+        let nuevosAgregados = 0;
+        let duplicadosOmitidos = 0;
 
-            alert("✅ Datos actualizados con éxito.");
-            location.reload();
-        }
+        datosAImportar.forEach(nuevo => {
+            const llaveNueva = `${nuevo.fecha}-${nuevo.departamento}`;
+            
+            if (!llavesExistentes.has(llaveNueva)) {
+                actuales.push(nuevo);
+                nuevosAgregados++;
+            } else {
+                duplicadosOmitidos++;
+            }
+        });
+
+        localStorage.setItem('auditData', JSON.stringify(actuales));
+        alert(`✅ Proceso completado:\n- ${nuevosAgregados} registros nuevos agregados.\n- ${duplicadosOmitidos} duplicados omitidos.`);
+        
+    } else {
+        // Modo Reemplazar: Borra todo y pone lo del JSON
+        localStorage.setItem('auditData', JSON.stringify(datosAImportar));
+        alert("✅ Base de datos reemplazada con éxito.");
+    }
+
+    cerrarModalConflicto();
+    location.reload();
+}
 
         function cerrarModalConflicto() {
             document.getElementById('conflictModal').classList.add('hidden');
@@ -141,33 +162,69 @@
 
         // --- EXPORTACIONES ---
         function descargarExcel() {
-            const data = JSON.parse(localStorage.getItem('auditData')) || [];
-            const ws = XLSX.utils.json_to_sheet(data);
-            const wb = XLSX.utils.book_new();
-            XLSX.utils.book_append_sheet(wb, ws, "Auditoria");
-            XLSX.writeFile(wb, "CENODE_Reporte.xlsx");
+    const data = JSON.parse(localStorage.getItem('auditData')) || [];
+    if (data.length === 0) return alert("No hay datos para exportar.");
+
+    // Mapeamos los datos para asegurar que todas las columnas tengan nombres claros
+    const dataFormateada = data.map(r => ({
+        "Fecha": r.fecha,
+        "Departamento": r.departamento,
+        "Total": r.total,
+        "Fact OK": r.factok,
+        "Real OK": r.realok,
+        "Resultado OK": r.resultadook,
+        "Enviado OK": r.enviadook,
+        "No Enviado": r.noenviado,
+        "Monto ($)": r.monto,
+        "% Cumplimiento": r.total > 0 ? Math.round((r.enviadook / r.total) * 100) + "%" : "0%"
+    }));
+
+    const ws = XLSX.utils.json_to_sheet(dataFormateada);
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, "Auditoría Completa");
+    XLSX.writeFile(wb, `CENODE_Full_Report_${new Date().toISOString().slice(0,10)}.xlsx`);
+}
+
+function descargarPDF() {
+    const { jsPDF } = window.jspdf;
+    // 'l' es para landscape (horizontal) para que quepan todas las columnas
+    const doc = new jsPDF('l', 'mm', 'a4'); 
+    const data = JSON.parse(localStorage.getItem('auditData')) || [];
+
+    if (data.length === 0) return alert("No hay datos para exportar.");
+
+    doc.setFontSize(16);
+    doc.text("REPORTE DETALLADO DE AUDITORÍA - CENODE", 14, 15);
+    doc.setFontSize(10);
+    doc.text(`Generado el: ${new Date().toLocaleString()}`, 14, 22);
+    
+    // Mapear todas las columnas para la tabla
+    const tableBody = data.map(r => [
+        r.fecha, 
+        r.departamento, 
+        r.total, 
+        r.factok, 
+        r.realok, 
+        r.resultadook, 
+        r.enviadook, 
+        r.noenviado, 
+        `$${parseFloat(r.monto).toFixed(2)}`
+    ]);
+    
+    doc.autoTable({
+        startY: 28,
+        head: [['Fecha', 'Depto', 'Total', 'Fact OK', 'Real OK', 'Res OK', 'Env OK', 'No Env', 'Monto']],
+        body: tableBody,
+        theme: 'striped',
+        headStyles: { fillColor: [6, 95, 70], fontSize: 8 }, // Color esmeralda
+        styles: { fontSize: 8, cellPadding: 2 },
+        columnStyles: {
+            8: { halign: 'right' } // Alinear monto a la derecha
         }
+    });
 
-        function descargarPDF() {
-            const { jsPDF } = window.jspdf;
-            const doc = new jsPDF('l', 'mm', 'a4');
-            const data = JSON.parse(localStorage.getItem('auditData')) || [];
-
-            doc.setFontSize(18);
-            doc.text("REPORTE DE AUDITORÍA MÉDICA - CENODE", 14, 20);
-            
-            const tableData = data.map(r => [r.fecha, r.departamento, r.total, r.enviadook, r.noenviado, `$${r.monto}`]);
-            
-            doc.autoTable({
-                startY: 30,
-                head: [['Fecha', 'Departamento', 'Total', 'Env OK', 'No Env', 'Monto']],
-                body: tableData,
-                theme: 'striped',
-                headStyles: { fillColor: [6, 95, 70] }
-            });
-
-            doc.save("CENODE_Reporte.pdf");
-        }
+    doc.save("CENODE_Reporte_Completo.pdf");
+}
 
         function exportarJSON() {
             const data = localStorage.getItem('auditData') || "[]";
